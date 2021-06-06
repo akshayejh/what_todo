@@ -214,7 +214,7 @@ class _TaskpageState extends State<Taskpage> {
                                     Todo _newTodo = Todo(
                                       title: value,
                                       isDone: 0,
-                                        taskId: _taskId,
+                                      taskId: _taskId,
                                     );
                                     await _dbHelper.insertTodo(_newTodo);
                                     setState(() {});
@@ -235,6 +235,46 @@ class _TaskpageState extends State<Taskpage> {
                     ),
                   )
                 ],
+              ),
+
+              // icon google map
+              Visibility(
+                visible: _contentVisile,
+                child:  Positioned(
+                  bottom: 24.0,
+                  right: 85.0,
+                  child: GestureDetector(
+
+                    // doan nay la kick vao no chuyen trang, can edit cho nay
+                    // onTap: () {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => Taskpage(
+                    //           task: null,
+                    //         )),
+                    //   ).then((value) {
+                    //     setState(() {});
+                    //   });
+                    // },
+                    child: Container(
+                      width: 60.0,
+                      height: 60.0,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [Color(0), Color(0)],
+                            begin: Alignment(0.0, -1.0),
+                            end: Alignment(0.0, 1.0)),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Image(
+                        image: AssetImage(
+                          "assets/images/google-maps.png",
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
               Visibility(
                 visible: _contentVisile,
