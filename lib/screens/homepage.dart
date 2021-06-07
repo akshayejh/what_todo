@@ -35,13 +35,13 @@ class _HomepageState extends State<Homepage> {
                   ),
                   Expanded(
                     child: FutureBuilder(
-                      initialData: [],
-                      future: _dbHelper.getTasks(),
-                      builder: (context, snapshot) {
+                      initialData: [], // cai deo gi day ?
+                      future: _dbHelper.getTasks(), // lay data cua Tasks
+                      builder: (context, snapshot) { // wtf ?
                         return ScrollConfiguration(
                           behavior: NoGlowBehaviour(),
-                          child: ListView.builder(
-                            itemCount: snapshot.data.length,
+                          child: ListView.builder( // cho nay de list cac tasks ra homepage
+                            itemCount: snapshot.data.length, // ?
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
@@ -49,7 +49,7 @@ class _HomepageState extends State<Homepage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => Taskpage(
-                                        task: snapshot.data[index],
+                                        task: snapshot.data[index],  // index lam deo gi day nhi
                                       ),
                                     ),
                                   ).then(
@@ -58,9 +58,10 @@ class _HomepageState extends State<Homepage> {
                                     },
                                   );
                                 },
-                                child: TaskCardWidget(
+                                child: TaskCardWidget( // 1 thang nay la 1 cai task
                                   title: snapshot.data[index].title,
                                   desc: snapshot.data[index].description,
+                                  location: snapshot.data[index].location,
                                 ),
                               );
                             },

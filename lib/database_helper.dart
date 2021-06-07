@@ -36,7 +36,7 @@ class DatabaseHelper {
   // cho nay update locationy
   Future<void> updateTaskLocation(int id, String location) async {
     Database _db = await database();
-    await _db.rawUpdate("UPDATE tasks SET title = '$location' WHERE id = '$id'");
+    await _db.rawUpdate("UPDATE tasks SET location = '$location' WHERE id = '$id'");
   }
 
   Future<void> updateTaskDescription(int id, String description) async {
@@ -53,7 +53,7 @@ class DatabaseHelper {
     Database _db = await database();
     List<Map<String, dynamic>> taskMap = await _db.query('tasks');
     return List.generate(taskMap.length, (index) {
-      return Task(id: taskMap[index]['id'], title: taskMap[index]['title'], description: taskMap[index]['description']);
+      return Task(id: taskMap[index]['id'], title: taskMap[index]['title'], description: taskMap[index]['description'], location: taskMap[index]['location']);
     });
   }
 

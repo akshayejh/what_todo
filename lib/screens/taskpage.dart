@@ -19,10 +19,12 @@ class _TaskpageState extends State<Taskpage> {
   int _taskId = 0;
   String _taskTitle = "";
   String _taskDescription = "";
+  String _taskLocation = "";
 
   FocusNode _titleFocus;
   FocusNode _descriptionFocus;
   FocusNode _todoFocus;
+  FocusNode _locationFocus;
 
   bool _contentVisile = false;
 
@@ -35,11 +37,13 @@ class _TaskpageState extends State<Taskpage> {
       _taskTitle = widget.task.title;
       _taskDescription = widget.task.description;
       _taskId = widget.task.id;
+      _taskLocation = widget.task.location; // cho nay lam gi day ?
     }
 
     _titleFocus = FocusNode();
     _descriptionFocus = FocusNode();
     _todoFocus = FocusNode();
+    _locationFocus = FocusNode();
 
     super.initState();
   }
@@ -49,6 +53,7 @@ class _TaskpageState extends State<Taskpage> {
     _titleFocus.dispose();
     _descriptionFocus.dispose();
     _todoFocus.dispose();
+    _locationFocus.dispose();
 
     super.dispose();
   }
@@ -82,7 +87,7 @@ class _TaskpageState extends State<Taskpage> {
                             ),
                           ),
                         ),
-                        Expanded(
+                        Expanded(//
                           child: TextField(
                             focusNode: _titleFocus,
                             onSubmitted: (value) async {
@@ -119,7 +124,8 @@ class _TaskpageState extends State<Taskpage> {
                       ],
                     ),
                   ),
-                  Visibility(
+
+                  Visibility(// nhap vao description
                     visible: _contentVisile,
                     child: Padding(
                       padding: EdgeInsets.only(
@@ -139,6 +145,35 @@ class _TaskpageState extends State<Taskpage> {
                         controller: TextEditingController()..text = _taskDescription,
                         decoration: InputDecoration(
                           hintText: "Enter Description for the task...",
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Visibility(// doan nhap vao location
+                    visible: _contentVisile,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        bottom: 12.0,
+                      ),
+                      child: TextField(
+                        focusNode: _locationFocus,
+                        onSubmitted: (value) async {
+                          if(value != ""){
+                            if(_taskId != 0){
+                              await _dbHelper.updateTaskLocation(_taskId, value);
+                              _taskLocation = value;
+                            }
+                          }
+                          _todoFocus.requestFocus();
+                        },
+                        controller: TextEditingController()..text = _taskLocation,
+                        decoration: InputDecoration(
+                          hintText: "Enter Location for the task...",
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,

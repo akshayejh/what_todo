@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class TaskCardWidget extends StatelessWidget {
   final String title;
   final String desc;
+  final String location;
 
-  TaskCardWidget({this.title, this.desc});
+  TaskCardWidget({this.title, this.desc, this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +39,19 @@ class TaskCardWidget extends StatelessWidget {
             ),
             child: Text(
               desc ?? "No Description Added",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Color(0xFF86829D),
+                height: 1.5,
+              ),
+            ),
+          ),
+          Padding( // cho nay hien thi location nay
+            padding: EdgeInsets.only(
+              top: 10.0,
+            ),
+            child: Text(
+              location ?? "No Location add",
               style: TextStyle(
                 fontSize: 16.0,
                 color: Color(0xFF86829D),
