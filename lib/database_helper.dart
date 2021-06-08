@@ -10,7 +10,7 @@ class DatabaseHelper {
     return openDatabase(
       join(await getDatabasesPath(), 'todo.db'),
       onCreate: (db, version) async {
-        await db.execute("CREATE TABLE tasks(id INTEGER PRIMARY KEY, title TEXT, description TEXT)");
+        await db.execute("CREATE TABLE tasks(id INTEGER PRIMARY KEY, title TEXT, description TEXT, location TEXT)");
         await db.execute("CREATE TABLE todo(id INTEGER PRIMARY KEY, taskId INTEGER, title TEXT, isDone INTEGER)");
 
         return db;
@@ -27,10 +27,16 @@ class DatabaseHelper {
     });
     return taskId;
   }
-  
+
   Future<void> updateTaskTitle(int id, String title) async {
     Database _db = await database();
     await _db.rawUpdate("UPDATE tasks SET title = '$title' WHERE id = '$id'");
+  }
+
+  // cho nay update locationy
+  Future<void> updateTaskLocation(int id, String location) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE tasks SET location = '$location' WHERE id = '$id'");
   }
 
   Future<void> updateTaskDescription(int id, String description) async {
@@ -47,7 +53,7 @@ class DatabaseHelper {
     Database _db = await database();
     List<Map<String, dynamic>> taskMap = await _db.query('tasks');
     return List.generate(taskMap.length, (index) {
-      return Task(id: taskMap[index]['id'], title: taskMap[index]['title'], description: taskMap[index]['description']);
+      return Task(id: taskMap[index]['id'], title: taskMap[index]['title'], description: taskMap[index]['description'], location: taskMap[index]['location']);
     });
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wemapgl/wemapgl.dart';
 import 'package:what_todo/database_helper.dart';
 import 'package:what_todo/models/task.dart';
 import 'package:what_todo/models/todo.dart';
@@ -16,13 +17,21 @@ class Taskpage extends StatefulWidget {
 class _TaskpageState extends State<Taskpage> {
   DatabaseHelper _dbHelper = DatabaseHelper();
 
+  WeMapSearchAPI searchAPI = WeMapSearchAPI();
+  // Timer? t;
+
+  List<WeMapPlace> result = [];
+  LatLng latLng = LatLng(20.037, 105.7876);
+
   int _taskId = 0;
   String _taskTitle = "";
   String _taskDescription = "";
+  String _taskLocation = "";
 
   FocusNode _titleFocus;
   FocusNode _descriptionFocus;
   FocusNode _todoFocus;
+  FocusNode _locationFocus;
 
   bool _contentVisile = false;
 
@@ -35,11 +44,13 @@ class _TaskpageState extends State<Taskpage> {
       _taskTitle = widget.task.title;
       _taskDescription = widget.task.description;
       _taskId = widget.task.id;
+      _taskLocation = widget.task.location; // cho nay lam gi day ?
     }
 
     _titleFocus = FocusNode();
     _descriptionFocus = FocusNode();
     _todoFocus = FocusNode();
+    _locationFocus = FocusNode();
 
     super.initState();
   }
@@ -49,6 +60,7 @@ class _TaskpageState extends State<Taskpage> {
     _titleFocus.dispose();
     _descriptionFocus.dispose();
     _todoFocus.dispose();
+    _locationFocus.dispose();
 
     super.dispose();
   }
@@ -83,6 +95,7 @@ class _TaskpageState extends State<Taskpage> {
                           ),
                         ),
                         Expanded(
+                          //
                           child: TextField(
                             focusNode: _titleFocus,
                             onSubmitted: (value) async {
@@ -91,13 +104,15 @@ class _TaskpageState extends State<Taskpage> {
                                 // Check if the task is null
                                 if (widget.task == null) {
                                   Task _newTask = Task(title: value);
-                                  _taskId = await _dbHelper.insertTask(_newTask);
+                                  _taskId =
+                                      await _dbHelper.insertTask(_newTask);
                                   setState(() {
                                     _contentVisile = true;
                                     _taskTitle = value;
                                   });
                                 } else {
-                                  await _dbHelper.updateTaskTitle(_taskId, value);
+                                  await _dbHelper.updateTaskTitle(
+                                      _taskId, value);
                                   print("Task Updated");
                                 }
                                 _descriptionFocus.requestFocus();
@@ -106,7 +121,7 @@ class _TaskpageState extends State<Taskpage> {
                             controller: TextEditingController()
                               ..text = _taskTitle,
                             decoration: InputDecoration(
-                              hintText: "Enter Task Title",
+                              hintText: "Tiêu đề",
                               border: InputBorder.none,
                             ),
                             style: TextStyle(
@@ -120,6 +135,7 @@ class _TaskpageState extends State<Taskpage> {
                     ),
                   ),
                   Visibility(
+                    // nhap vao description
                     visible: _contentVisile,
                     child: Padding(
                       padding: EdgeInsets.only(
@@ -128,17 +144,19 @@ class _TaskpageState extends State<Taskpage> {
                       child: TextField(
                         focusNode: _descriptionFocus,
                         onSubmitted: (value) async {
-                          if(value != ""){
-                            if(_taskId != 0){
-                              await _dbHelper.updateTaskDescription(_taskId, value);
+                          if (value != "") {
+                            if (_taskId != 0) {
+                              await _dbHelper.updateTaskDescription(
+                                  _taskId, value);
                               _taskDescription = value;
                             }
                           }
                           _todoFocus.requestFocus();
                         },
-                        controller: TextEditingController()..text = _taskDescription,
+                        controller: TextEditingController()
+                          ..text = _taskDescription,
                         decoration: InputDecoration(
-                          hintText: "Enter Description for the task...",
+                          hintText: "Mô tả",
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 24.0,
@@ -159,10 +177,12 @@ class _TaskpageState extends State<Taskpage> {
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () async {
-                                  if(snapshot.data[index].isDone == 0){
-                                    await _dbHelper.updateTodoDone(snapshot.data[index].id, 1);
+                                  if (snapshot.data[index].isDone == 0) {
+                                    await _dbHelper.updateTodoDone(
+                                        snapshot.data[index].id, 1);
                                   } else {
-                                    await _dbHelper.updateTodoDone(snapshot.data[index].id, 0);
+                                    await _dbHelper.updateTodoDone(
+                                        snapshot.data[index].id, 0);
                                   }
                                   setState(() {});
                                 },
@@ -179,6 +199,92 @@ class _TaskpageState extends State<Taskpage> {
                       },
                     ),
                   ),
+                  Visibility(
+                    // doan nhap vao location
+                    visible: _contentVisile,
+                    child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Địa điểm',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18.0),
+                            ),
+                            Text(
+                              _taskLocation,
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                          ],
+                        )),
+                  ),
+                  Visibility(
+                      // doan nhap vao location
+                      visible: _contentVisile,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Nhập địa điểm tìm kiếm',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18.0),
+                            ),
+                            TextField(
+                              decoration: InputDecoration(
+                                hintText: "Tìm kiếm địa điểm",
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 24.0,
+                                ),
+                              ),
+                              onChanged: (text) async {
+                                // if (t != null) t!.cancel();
+                                // t = Timer(Duration(seconds: 1), () async {
+                                List<WeMapPlace> places =
+                                    await searchAPI.getSearchResult(
+                                        text, latLng, WeMapGeocoder.Pelias);
+                                setState(() {
+                                  result = places;
+                                });
+                                // });
+                              },
+                            ),
+                          ],
+                        ),
+                      )),
+                  Visibility(
+                      // doan nhap vao location
+                      visible: _contentVisile,
+                      child: Expanded(
+                          child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                        ),
+                        child: ListView.builder(
+                            itemCount: result.length,
+                            itemBuilder: (BuildContext ctxt, int idx) {
+                              return ListTile(
+                                  onTap: () async {
+                                    if (result[idx].placeName != "") {
+                                      if (_taskId != 0) {
+                                        await _dbHelper.updateTaskLocation(
+                                            _taskId, result[idx].placeName);
+                                        setState(() {
+                                          _taskLocation = result[idx].placeName;
+                                        });
+                                      }
+                                    }
+                                    _todoFocus.requestFocus();
+                                  },
+                                  title: Text(result[idx].placeName ?? ""));
+                            }),
+                      ))),
                   Visibility(
                     visible: _contentVisile,
                     child: Padding(
@@ -214,7 +320,7 @@ class _TaskpageState extends State<Taskpage> {
                                     Todo _newTodo = Todo(
                                       title: value,
                                       isDone: 0,
-                                        taskId: _taskId,
+                                      taskId: _taskId,
                                     );
                                     await _dbHelper.insertTodo(_newTodo);
                                     setState(() {});
@@ -225,7 +331,7 @@ class _TaskpageState extends State<Taskpage> {
                                 }
                               },
                               decoration: InputDecoration(
-                                hintText: "Enter Todo item...",
+                                hintText: "Nhập công việc",
                                 border: InputBorder.none,
                               ),
                             ),
@@ -236,6 +342,43 @@ class _TaskpageState extends State<Taskpage> {
                   )
                 ],
               ),
+
+              // icon google map
+              // Visibility(
+              //   visible: _contentVisile,
+              //   child: Positioned(
+              //     bottom: 24.0,
+              //     right: 85.0,
+              //     child: GestureDetector(
+              //       // doan nay la kick vao no chuyen trang, can edit cho nay
+              //       // onTap: () {
+              //       //   Navigator.push(
+              //       //     context,
+              //       //     MaterialPageRoute(
+              //       //         builder: (context) => SearchAPI(task: widget.task)),
+              //       //   ).then((value) {
+              //       //     setState(() {});
+              //       //   });
+              //       // },
+              //       child: Container(
+              //         width: 60.0,
+              //         height: 60.0,
+              //         decoration: BoxDecoration(
+              //           gradient: LinearGradient(
+              //               colors: [Color(0), Color(0)],
+              //               begin: Alignment(0.0, -1.0),
+              //               end: Alignment(0.0, 1.0)),
+              //           borderRadius: BorderRadius.circular(20.0),
+              //         ),
+              //         child: Image(
+              //           image: AssetImage(
+              //             "assets/images/google-maps.png",
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
               Visibility(
                 visible: _contentVisile,
                 child: Positioned(
@@ -243,7 +386,7 @@ class _TaskpageState extends State<Taskpage> {
                   right: 24.0,
                   child: GestureDetector(
                     onTap: () async {
-                      if(_taskId != 0) {
+                      if (_taskId != 0) {
                         await _dbHelper.deleteTask(_taskId);
                         Navigator.pop(context);
                       }

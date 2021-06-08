@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class TaskCardWidget extends StatelessWidget {
   final String title;
   final String desc;
+  final String location;
 
-  TaskCardWidget({this.title, this.desc});
+  TaskCardWidget({this.title, this.desc, this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class TaskCardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title ?? "(Unnamed Task)",
+            title ?? "Không có tên công việc",
             style: TextStyle(
               color: Color(0xFF211551),
               fontSize: 22.0,
@@ -37,7 +38,21 @@ class TaskCardWidget extends StatelessWidget {
               top: 10.0,
             ),
             child: Text(
-              desc ?? "No Description Added",
+              desc ?? "Không có mô tả",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Color(0xFF86829D),
+                height: 1.5,
+              ),
+            ),
+          ),
+          Padding(
+            // cho nay hien thi location nay
+            padding: EdgeInsets.only(
+              top: 10.0,
+            ),
+            child: Text(
+              location ?? "Không có địa điểm",
               style: TextStyle(
                 fontSize: 16.0,
                 color: Color(0xFF86829D),
@@ -73,20 +88,18 @@ class TodoWidget extends StatelessWidget {
               right: 12.0,
             ),
             decoration: BoxDecoration(
-              color: isDone ? Color(0xFF7349FE) : Colors.transparent,
-              borderRadius: BorderRadius.circular(6.0),
-              border: isDone ? null : Border.all(
-                color: Color(0xFF86829D),
-                width: 1.5
-              )
-            ),
+                color: isDone ? Color(0xFF7349FE) : Colors.transparent,
+                borderRadius: BorderRadius.circular(6.0),
+                border: isDone
+                    ? null
+                    : Border.all(color: Color(0xFF86829D), width: 1.5)),
             child: Image(
               image: AssetImage('assets/images/check_icon.png'),
             ),
           ),
           Flexible(
             child: Text(
-              text ?? "(Unnamed Todo)",
+              text ?? "Không có nhiệm vụ",
               style: TextStyle(
                 color: isDone ? Color(0xFF211551) : Color(0xFF86829D),
                 fontSize: 16.0,
@@ -103,7 +116,7 @@ class TodoWidget extends StatelessWidget {
 class NoGlowBehaviour extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
-    BuildContext context, Widget child, AxisDirection axisDirection) {
+      BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
   }
 }

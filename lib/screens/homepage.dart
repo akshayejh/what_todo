@@ -24,24 +24,25 @@ class _HomepageState extends State<Homepage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(
-                      top: 32.0,
-                      bottom: 32.0,
-                    ),
-                    child: Image(
-                      image: AssetImage('assets/images/logo.png'),
-                    ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 24.0),
+                    child: Text('Danh sách công việc',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 26.0)),
                   ),
                   Expanded(
+                      child: Padding(
+                    padding: EdgeInsets.only(top: 24.0),
                     child: FutureBuilder(
-                      initialData: [],
-                      future: _dbHelper.getTasks(),
+                      initialData: [], // cai deo gi day ?
+                      future: _dbHelper.getTasks(), // lay data cua Tasks
                       builder: (context, snapshot) {
+                        // wtf ?
                         return ScrollConfiguration(
                           behavior: NoGlowBehaviour(),
                           child: ListView.builder(
-                            itemCount: snapshot.data.length,
+                            // cho nay de list cac tasks ra homepage
+                            itemCount: snapshot.data.length, // ?
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
@@ -49,7 +50,8 @@ class _HomepageState extends State<Homepage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => Taskpage(
-                                        task: snapshot.data[index],
+                                        task: snapshot.data[
+                                            index], // index lam deo gi day nhi
                                       ),
                                     ),
                                   ).then(
@@ -59,8 +61,10 @@ class _HomepageState extends State<Homepage> {
                                   );
                                 },
                                 child: TaskCardWidget(
+                                  // 1 thang nay la 1 cai task
                                   title: snapshot.data[index].title,
                                   desc: snapshot.data[index].description,
+                                  location: snapshot.data[index].location,
                                 ),
                               );
                             },
@@ -68,7 +72,7 @@ class _HomepageState extends State<Homepage> {
                         );
                       },
                     ),
-                  )
+                  ))
                 ],
               ),
               Positioned(
