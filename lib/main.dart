@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:what_todo/screens/homepage.dart';
+import 'package:wemapgl/wemapgl.dart' as WEMAP;
 
 void main() {
+  WEMAP.Configuration.setWeMapKey('GqfwrZUEfxbwbnQUhtBMFivEysYIxelQ');
   runApp(MyApp());
 }
 
